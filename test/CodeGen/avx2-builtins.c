@@ -177,7 +177,8 @@ __m256i test_mm256_blendv_epi8(__m256i a, __m256i b, __m256i m) {
 }
 
 __m256i test_mm256_blend_epi16(__m256i a, __m256i b) {
-  // CHECK: @llvm.x86.avx2.pblendw(<16 x i16> %{{.*}}, <16 x i16> %{{.*}}, i32 2)
+  // CHECK-LABEL: test_mm256_blend_epi16
+  // CHECK: shufflevector <16 x i16> %{{.*}}, <16 x i16> %{{.*}}, <16 x i32> <i32 0, i32 17, i32 2, i32 3, i32 4, i32 5, i32 6, i32 7, i32 8, i32 25, i32 10, i32 11, i32 12, i32 13, i32 14, i32 15>
   return _mm256_blend_epi16(a, b, 2);
 }
 
@@ -612,12 +613,12 @@ __m256i test_mm256_broadcastsi128_si256(__m128i a) {
 }
 
 __m128i test_mm_blend_epi32(__m128i a, __m128i b) {
-  // CHECK: @llvm.x86.avx2.pblendd.128
+  // CHECK: shufflevector <4 x i32> %{{.*}}, <4 x i32> %{{.*}}, <4 x i32> <i32 4, i32 1, i32 2, i32 7>
   return _mm_blend_epi32(a, b, 57);
 }
 
 __m256i test_mm256_blend_epi32(__m256i a, __m256i b) {
-  // CHECK: @llvm.x86.avx2.pblendd.256
+  // CHECK: shufflevector <8 x i32> %{{.*}}, <8 x i32> %{{.*}}, <8 x i32> <i32 8, i32 1, i32 2, i32 11, i32 12, i32 13, i32 6, i32 7>
   return _mm256_blend_epi32(a, b, 57);
 }
 
