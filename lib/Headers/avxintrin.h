@@ -305,6 +305,7 @@ _mm256_permutevar_ps(__m256 __a, __m256i __c)
   (__m256i)__builtin_ia32_vperm2f128_si256((__v8si)__V1, (__v8si)__V2, (M)); })
 
 /* Vector Blend */
+#define __builtin_ia32_blendpd256 _mm256_blend_pd
 #define _mm256_blend_pd(V1, V2, M) __extension__ ({ \
   __m256d __V1 = (V1); \
   __m256d __V2 = (V2); \
@@ -314,6 +315,7 @@ _mm256_permutevar_ps(__m256 __a, __m256i __c)
                                    (((M) & 0x04) ? 6 : 2), \
                                    (((M) & 0x08) ? 7 : 3)); })
 
+#define __builtin_ia32_blendps256 _mm256_blend_ps
 #define _mm256_blend_ps(V1, V2, M) __extension__ ({ \
   __m256 __V1 = (V1); \
   __m256 __V2 = (V2); \

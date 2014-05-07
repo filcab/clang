@@ -76,6 +76,7 @@
   (__m128d) __builtin_ia32_roundsd((__v2df)__X, (__v2df)__Y, (M)); })
 
 /* SSE4 Packed Blending Intrinsics.  */
+#define __builtin_ia32_blendpd _mm_blend_pd
 #define _mm_blend_pd(V1, V2, M) __extension__ ({ \
   __m128d __V1 = (V1); \
   __m128d __V2 = (V2); \
@@ -83,6 +84,8 @@
                                    (((M) & 0x01) ? 2 : 0), \
                                    (((M) & 0x02) ? 3 : 1)); })
 
+
+#define __builtin_ia32_blendps _mm_blend_ps
 #define _mm_blend_ps(V1, V2, M) __extension__ ({ \
   __m128 __V1 = (V1); \
   __m128 __V2 = (V2); \
@@ -113,6 +116,7 @@ _mm_blendv_epi8 (__m128i __V1, __m128i __V2, __m128i __M)
                                                (__v16qi)__M);
 }
 
+#define __builtin_ia32_pblendw128 _mm_blend_epi16
 #define _mm_blend_epi16(V1, V2, M) __extension__ ({ \
   __m128i __V1 = (V1); \
   __m128i __V2 = (V2); \

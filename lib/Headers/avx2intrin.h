@@ -157,6 +157,7 @@ _mm256_blendv_epi8(__m256i __V1, __m256i __V2, __m256i __M)
                                               (__v32qi)__M);
 }
 
+#define __builtin_ia32_pblendw256 _mm256_blend_epi16
 #define _mm256_blend_epi16(V1, V2, M) __extension__ ({ \
   __m256i __V1 = (V1); \
   __m256i __V2 = (V2); \
@@ -774,6 +775,7 @@ _mm256_broadcastsi128_si256(__m128i __X)
   return (__m256i)__builtin_ia32_vbroadcastsi256(__X);
 }
 
+#define __builtin_ia32_pblendd128 _mm_blend_epi32
 #define _mm_blend_epi32(V1, V2, M) __extension__ ({ \
   __m128i __V1 = (V1); \
   __m128i __V2 = (V2); \
@@ -783,6 +785,7 @@ _mm256_broadcastsi128_si256(__m128i __X)
                                    (((M) & 0x04) ? 6 : 2), \
                                    (((M) & 0x08) ? 7 : 3)); })
 
+#define __builtin_ia32_pblendd256 _mm256_blend_epi32
 #define _mm256_blend_epi32(V1, V2, M) __extension__ ({ \
   __m256i __V1 = (V1); \
   __m256i __V2 = (V2); \
