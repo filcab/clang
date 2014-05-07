@@ -84,7 +84,6 @@
                                    (((M) & 0x01) ? 2 : 0), \
                                    (((M) & 0x02) ? 3 : 1)); })
 
-
 #define __builtin_ia32_blendps _mm_blend_ps
 #define _mm_blend_ps(V1, V2, M) __extension__ ({ \
   __m128 __V1 = (V1); \
