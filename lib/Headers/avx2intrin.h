@@ -538,9 +538,103 @@ _mm256_sign_epi32(__m256i __a, __m256i __b)
     return (__m256i)__builtin_ia32_psignd256((__v8si)__a, (__v8si)__b);
 }
 
-#define _mm256_slli_si256(a, count) __extension__ ({ \
-  __m256i __a = (a); \
-  (__m256i)__builtin_ia32_pslldqi256(__a, (count)*8); })
+/*
+<0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+ 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31>
+->
+<X X X X X 0 1 2 3 4  5  6  7  8  9 10
+^^ imm&0xf0 ? 0 : 32 - (imm&0xf + 16*(imm&0xf<N))
+
+ XX XX XX XX XX 16 17 18 19 20 21 22 23 24 25 26>
+ */
+
+//#define _mm256_slli_si256(a, imm)                                              \
+//  __extension__({                                                              \
+//    _Pragma("clang diagnostic push")                                           \
+//        _Pragma("clang diagnostic ignored \"-Wshadow\"");                      \
+//    __m256i __a = (a);                                                         \
+//    _Pragma("clang diagnostic pop");                                           \
+//    __m128i __res0 = _mm_slli_si128(((__m128i) {__a[0], __a[1]}), imm);        \
+//    __m128i __res1 = _mm_slli_si128(((__m128i) {__a[2], __a[3]}), imm);        \
+//    (__m256i) __builtin_shufflevector(__res0, __res1, 0, 1, 2, 3);             \
+//  })
+
+#define _mm256_slli_si256(a, imm)                                              \
+  __extension__({                                                              \
+    _Pragma("clang diagnostic push")                                           \
+        _Pragma("clang diagnostic ignored \"-Wshadow\"");                      \
+    __m256i __a = (a);                                                         \
+    _Pragma("clang diagnostic pop");                                           \
+    (__m256i) __builtin_shufflevector(                                         \
+        (__v32qi)_mm256_setzero_si256(), (__v32qi)__a,                         \
+        ((imm)&0xF0) ? 0 : 32 - ((imm)&0xF) - 16*(((imm)&0xF)>0),        \
+        ((imm)&0xF0) ? 0 : 33 - ((imm)&0xF) - 16*(((imm)&0xF)>1),        \
+        ((imm)&0xF0) ? 0 : 34 - ((imm)&0xF) - 16*(((imm)&0xF)>2),        \
+        ((imm)&0xF0) ? 0 : 35 - ((imm)&0xF) - 16*(((imm)&0xF)>3),        \
+        ((imm)&0xF0) ? 0 : 36 - ((imm)&0xF) - 16*(((imm)&0xF)>4),        \
+        ((imm)&0xF0) ? 0 : 37 - ((imm)&0xF) - 16*(((imm)&0xF)>5),        \
+        ((imm)&0xF0) ? 0 : 38 - ((imm)&0xF) - 16*(((imm)&0xF)>6),        \
+        ((imm)&0xF0) ? 0 : 39 - ((imm)&0xF) - 16*(((imm)&0xF)>7),        \
+        ((imm)&0xF0) ? 0 : 40 - ((imm)&0xF) - 16*(((imm)&0xF)>8),        \
+        ((imm)&0xF0) ? 0 : 41 - ((imm)&0xF) - 16*(((imm)&0xF)>9),       \
+        ((imm)&0xF0) ? 0 : 42 - ((imm)&0xF) - 16*(((imm)&0xF)>19),       \
+        ((imm)&0xF0) ? 0 : 43 - ((imm)&0xF) - 16*(((imm)&0xF)>11),       \
+        ((imm)&0xF0) ? 0 : 44 - ((imm)&0xF) - 16*(((imm)&0xF)>12),       \
+        ((imm)&0xF0) ? 0 : 45 - ((imm)&0xF) - 16*(((imm)&0xF)>13),       \
+        ((imm)&0xF0) ? 0 : 46 - ((imm)&0xF) - 16*(((imm)&0xF)>14),       \
+        ((imm)&0xF0) ? 0 : 47 - ((imm)&0xF) - 16*(((imm)&0xF)>15),       \
+      \
+        ((imm)&0xF0) ? 0 : 48 - ((imm)&0xF) - 16*(((imm)&0xF)>0),        \
+        ((imm)&0xF0) ? 0 : 49 - ((imm)&0xF) - 16*(((imm)&0xF)>1),        \
+        ((imm)&0xF0) ? 0 : 50 - ((imm)&0xF) - 16*(((imm)&0xF)>2),        \
+        ((imm)&0xF0) ? 0 : 51 - ((imm)&0xF) - 16*(((imm)&0xF)>3),        \
+        ((imm)&0xF0) ? 0 : 52 - ((imm)&0xF) - 16*(((imm)&0xF)>4),        \
+        ((imm)&0xF0) ? 0 : 53 - ((imm)&0xF) - 16*(((imm)&0xF)>5),        \
+        ((imm)&0xF0) ? 0 : 54 - ((imm)&0xF) - 16*(((imm)&0xF)>6),        \
+        ((imm)&0xF0) ? 0 : 55 - ((imm)&0xF) - 16*(((imm)&0xF)>7),        \
+        ((imm)&0xF0) ? 0 : 56 - ((imm)&0xF) - 16*(((imm)&0xF)>8),        \
+        ((imm)&0xF0) ? 0 : 57 - ((imm)&0xF) - 16*(((imm)&0xF)>9),       \
+        ((imm)&0xF0) ? 0 : 58 - ((imm)&0xF) - 16*(((imm)&0xF)>19),       \
+        ((imm)&0xF0) ? 0 : 59 - ((imm)&0xF) - 16*(((imm)&0xF)>11),       \
+        ((imm)&0xF0) ? 0 : 60 - ((imm)&0xF) - 16*(((imm)&0xF)>12),       \
+        ((imm)&0xF0) ? 0 : 61 - ((imm)&0xF) - 16*(((imm)&0xF)>13),       \
+        ((imm)&0xF0) ? 0 : 62 - ((imm)&0xF) - 16*(((imm)&0xF)>14),       \
+        ((imm)&0xF0) ? 0 : 63 - ((imm)&0xF) - 16*(((imm)&0xF)>15));      \
+  })
+
+//        ((imm))&0xF0) ? 0 : 32 - (32 * (((imm)&0xF) >= 1) + ((imm)&0xF)*(((imm)&0xF) < 1),        \
+//        ((imm))&0xF0) ? 0 : 33 - (32 * (((imm)&0xF) >= 2) + ((imm)&0xF)*(((imm)&0xF) < 2),        \
+//        ((imm))&0xF0) ? 0 : 34 - (32 * (((imm)&0xF) >= 3) + ((imm)&0xF)*(((imm)&0xF) < 3),        \
+//        ((imm))&0xF0) ? 0 : 35 - (32 * (((imm)&0xF) >= 4) + ((imm)&0xF)*(((imm)&0xF) < 4),        \
+//        ((imm))&0xF0) ? 0 : 36 - (32 * (((imm)&0xF) >= 5) + ((imm)&0xF)*(((imm)&0xF) < 5),        \
+//        ((imm))&0xF0) ? 0 : 37 - (32 * (((imm)&0xF) >= 6) + ((imm)&0xF)*(((imm)&0xF) < 6),        \
+//        ((imm))&0xF0) ? 0 : 38 - (32 * (((imm)&0xF) >= 7) + ((imm)&0xF)*(((imm)&0xF) < 7),        \
+//        ((imm))&0xF0) ? 0 : 39 - (32 * (((imm)&0xF) >= 8) + ((imm)&0xF)*(((imm)&0xF) < 8),        \
+//        ((imm))&0xF0) ? 0 : 40 - (32 * (((imm)&0xF) >= 9) + ((imm)&0xF)*(((imm)&0xF) < 9),        \
+//        ((imm))&0xF0) ? 0 : 41 - (32 * (((imm)&0xF) >= 10) + ((imm)&0xF)*(((imm)&0xF) < 10),       \
+//        ((imm))&0xF0) ? 0 : 42 - (32 * (((imm)&0xF) >= 11) + ((imm)&0xF)*(((imm)&0xF) < 11),       \
+//        ((imm))&0xF0) ? 0 : 43 - (32 * (((imm)&0xF) >= 12) + ((imm)&0xF)*(((imm)&0xF) < 12),       \
+//        ((imm))&0xF0) ? 0 : 44 - (32 * (((imm)&0xF) >= 13) + ((imm)&0xF)*(((imm)&0xF) < 13),       \
+//        ((imm))&0xF0) ? 0 : 45 - (32 * (((imm)&0xF) >= 14) + ((imm)&0xF)*(((imm)&0xF) < 14),       \
+//        ((imm))&0xF0) ? 0 : 46 - (32 * (((imm)&0xF) >= 15) + ((imm)&0xF)*(((imm)&0xF) < 15),       \
+//        ((imm))&0xF0) ? 0 : 47 - (32 * (((imm)&0xF) >= 15) + ((imm)&0xF)*(((imm)&0xF) < 16),       \
+//        ((imm))&0xF0) ? 0 : 48 - (32 * (((imm)&0xF) >= 1) + ((imm)&0xF)*(((imm)&0xF) < 1),        \
+//        ((imm))&0xF0) ? 0 : 49 - (32 * (((imm)&0xF) >= 2) + ((imm)&0xF)*(((imm)&0xF) < 2),        \
+//        ((imm))&0xF0) ? 0 : 50 - (32 * (((imm)&0xF) >= 3) + ((imm)&0xF)*(((imm)&0xF) < 3),        \
+//        ((imm))&0xF0) ? 0 : 51 - (32 * (((imm)&0xF) >= 4) + ((imm)&0xF)*(((imm)&0xF) < 4),        \
+//        ((imm))&0xF0) ? 0 : 52 - (32 * (((imm)&0xF) >= 5) + ((imm)&0xF)*(((imm)&0xF) < 5),        \
+//        ((imm))&0xF0) ? 0 : 53 - (32 * (((imm)&0xF) >= 6) + ((imm)&0xF)*(((imm)&0xF) < 6),        \
+//        ((imm))&0xF0) ? 0 : 54 - (32 * (((imm)&0xF) >= 7) + ((imm)&0xF)*(((imm)&0xF) < 7),        \
+//        ((imm))&0xF0) ? 0 : 55 - (32 * (((imm)&0xF) >= 8) + ((imm)&0xF)*(((imm)&0xF) < 8),        \
+//        ((imm))&0xF0) ? 0 : 56 - (32 * (((imm)&0xF) >= 9) + ((imm)&0xF)*(((imm)&0xF) < 9),        \
+//        ((imm))&0xF0) ? 0 : 57 - (32 * (((imm)&0xF) >= 10) + ((imm)&0xF)*(((imm)&0xF) < 10),       \
+//        ((imm))&0xF0) ? 0 : 58 - (32 * (((imm)&0xF) >= 11) + ((imm)&0xF)*(((imm)&0xF) < 11),       \
+//        ((imm))&0xF0) ? 0 : 59 - (32 * (((imm)&0xF) >= 12) + ((imm)&0xF)*(((imm)&0xF) < 12),       \
+//        ((imm))&0xF0) ? 0 : 60 - (32 * (((imm)&0xF) >= 13) + ((imm)&0xF)*(((imm)&0xF) < 13),       \
+//        ((imm))&0xF0) ? 0 : 61 - (32 * (((imm)&0xF) >= 14) + ((imm)&0xF)*(((imm)&0xF) < 14),       \
+//        ((imm))&0xF0) ? 0 : 62 - (32 * (((imm)&0xF) >= 15) + ((imm)&0xF)*(((imm)&0xF) < 15),       \
+//        ((imm))&0xF0) ? 0 : 63 - (32 * (((imm)&0xF) >= 15) + ((imm)&0xF)*(((imm)&0xF) < 16));      \
+  })
 
 static __inline__ __m256i __attribute__((__always_inline__, __nodebug__))
 _mm256_slli_epi16(__m256i __a, int __count)
@@ -602,9 +696,47 @@ _mm256_sra_epi32(__m256i __a, __m128i __count)
   return (__m256i)__builtin_ia32_psrad256((__v8si)__a, (__v4si)__count);
 }
 
-#define _mm256_srli_si256(a, count) __extension__ ({ \
-  __m256i __a = (a); \
-  (__m256i)__builtin_ia32_psrldqi256(__a, (count)*8); })
+#define _mm256_srli_si256(a, imm)                                              \
+  __extension__({                                                              \
+    _Pragma("clang diagnostic push")                                           \
+        _Pragma("clang diagnostic ignored \"-Wshadow\"");                      \
+    __v32qi __a = (__v32qi)(a);                                                \
+    _Pragma("clang diagnostic pop");                                           \
+    (__m256i)                                                           \
+        __builtin_shufflevector(__a, (__v32qi)_mm_setzero_si256(),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F),      \
+                                ((imm)&0x370) ? 32 : ((imm)&0x1F);             \
+  })
 
 static __inline__ __m256i __attribute__((__always_inline__, __nodebug__))
 _mm256_srli_epi16(__m256i __a, int __count)
