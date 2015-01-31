@@ -4,34 +4,34 @@
 // the vptr sanitizer with -fno-rtti
 
 // -fsanitize=vptr
-// RUN: %clang -### -c -target x86_64-scei-ps4 -fsanitize=vptr %s 2>&1 | FileCheck -check-prefix=CHECK-SAN-WARN %s
-// RUN: %clang -### -c -target x86_64-scei-ps4 -fsanitize=vptr -frtti %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s
+// RUN: %clang -### -c -target x86_64-scei-ps4 -fsanitize=vptr %s 2>&1 | FileCheck -check-prefix=CHECK-SAN-WARN %s --check-prefix=NO-RTTI
+// RUN: %clang -### -c -target x86_64-scei-ps4 -fsanitize=vptr -frtti %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s --check-prefix=RTTI
 // RUN: %clang -### -c -target x86_64-scei-ps4 -fsanitize=vptr -fno-rtti %s 2>&1 | FileCheck -check-prefix=CHECK-SAN-ERROR %s
-// RUN: %clang -### -c -target x86_64-scei-ps4 -fsanitize=undefined %s 2>&1 | FileCheck -check-prefix=CHECK-SAN-WARN %s
-// RUN: %clang -### -c -target x86_64-scei-ps4 -fsanitize=undefined -frtti %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s
+// RUN: %clang -### -c -target x86_64-scei-ps4 -fsanitize=undefined %s 2>&1 | FileCheck -check-prefix=CHECK-SAN-WARN %s --check-prefix=NO-RTTI
+// RUN: %clang -### -c -target x86_64-scei-ps4 -fsanitize=undefined -frtti %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s --check-prefix=RTTI
 // RUN: %clang -### -c -target x86_64-scei-ps4 -fsanitize=undefined -fno-rtti %s 2>&1 | FileCheck -check-prefix=CHECK-SAN-ERROR %s
-// RUN: %clang -### -c -target x86_64-unknown-unknown -fsanitize=vptr %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s
-// RUN: %clang -### -c -target x86_64-unknown-unknown -fsanitize=vptr -frtti %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s
+// RUN: %clang -### -c -target x86_64-unknown-unknown -fsanitize=vptr %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s --check-prefix=NO-RTTI
+// RUN: %clang -### -c -target x86_64-unknown-unknown -fsanitize=vptr -frtti %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s --check-prefix=NO-RTTI
 // RUN: %clang -### -c -target x86_64-unknown-unknown -fsanitize=vptr -fno-rtti %s 2>&1 | FileCheck -check-prefix=CHECK-SAN-ERROR %s
-// RUN: %clang -### -c -target x86_64-unknown-unknown -fsanitize=undefined %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s
-// RUN: %clang -### -c -target x86_64-unknown-unknown -fsanitize=undefined -frtti %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s
+// RUN: %clang -### -c -target x86_64-unknown-unknown -fsanitize=undefined %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s --check-prefix=NO-RTTI
+// RUN: %clang -### -c -target x86_64-unknown-unknown -fsanitize=undefined -frtti %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s --check-prefix=NO-RTTI
 // RUN: %clang -### -c -target x86_64-unknown-unknown -fsanitize=undefined -fno-rtti %s 2>&1 | FileCheck -check-prefix=CHECK-SAN-ERROR %s
 
 // Exceptions + no/default rtti
 // RUN: %clang -### -c -target x86_64-scei-ps4 -fexceptions -fno-rtti %s 2>&1 | FileCheck -check-prefix=CHECK-EXC-ERROR %s
 // RUN: %clang -### -c -target x86_64-scei-ps4 -fcxx-exceptions -fno-rtti %s 2>&1 | FileCheck -check-prefix=CHECK-EXC-ERROR-CXX %s
-// RUN: %clang -### -c -target x86_64-scei-ps4 -fexceptions %s 2>&1 | FileCheck -check-prefix=CHECK-EXC-WARN %s
-// RUN: %clang -### -c -target x86_64-scei-ps4 -fcxx-exceptions %s 2>&1 | FileCheck -check-prefix=CHECK-EXC-WARN %s
-// RUN: %clang -### -c -target x86_64-unknown-unknown -fexceptions -fno-rtti %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s
-// RUN: %clang -### -c -target x86_64-unknown-unknown -fcxx-exceptions -fno-rtti %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s
-// RUN: %clang -### -c -target x86_64-unknown-unknown -fexceptions %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s
-// RUN: %clang -### -c -target x86_64-unknown-unknown -fcxx-exceptions %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s
+// RUN: %clang -### -c -target x86_64-scei-ps4 -fexceptions %s 2>&1 | FileCheck -check-prefix=CHECK-EXC-WARN %s --check-prefix=RTTI
+// RUN: %clang -### -c -target x86_64-scei-ps4 -fcxx-exceptions %s 2>&1 | FileCheck -check-prefix=CHECK-EXC-WARN %s --check-prefix=RTTI
+// RUN: %clang -### -c -target x86_64-unknown-unknown -fexceptions -fno-rtti %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s --check-prefix=NO-RTTI
+// RUN: %clang -### -c -target x86_64-unknown-unknown -fcxx-exceptions -fno-rtti %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s --check-prefix=NO-RTTI
+// RUN: %clang -### -c -target x86_64-unknown-unknown -fexceptions %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s --check-prefix=RTTI
+// RUN: %clang -### -c -target x86_64-unknown-unknown -fcxx-exceptions %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s --check-prefix=RTTI
 
 // -frtti + exceptions
-// RUN: %clang -### -c -target x86_64-scei-ps4 -fexceptions -frtti %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s
-// RUN: %clang -### -c -target x86_64-scei-ps4 -fcxx-exceptions -frtti %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s
-// RUN: %clang -### -c -target x86_64-unknown-unknown -fexceptions -frtti %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s
-// RUN: %clang -### -c -target x86_64-unknown-unknown -fcxx-exceptions -frtti %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s
+// RUN: %clang -### -c -target x86_64-scei-ps4 -fexceptions -frtti %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s --check-prefix=RTTI
+// RUN: %clang -### -c -target x86_64-scei-ps4 -fcxx-exceptions -frtti %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s --check-prefix=RTTI
+// RUN: %clang -### -c -target x86_64-unknown-unknown -fexceptions -frtti %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s --check-prefix=RTTI
+// RUN: %clang -### -c -target x86_64-unknown-unknown -fcxx-exceptions -frtti %s 2>&1 | FileCheck -check-prefix=CHECK-OK %s --check-prefix=RTTI
 
 // -f{no-,}rtti/default
 // RUN: %clang -### -c -target x86_64-scei-ps4 -frtti %s 2>&1 | FileCheck -check-prefix=CHECK-RTTI %s
@@ -46,7 +46,13 @@
 // CHECK-EXC-WARN: implicitly enabling rtti for exception handling
 // CHECK-EXC-ERROR: invalid argument '-fno-rtti' not allowed with '-fexceptions'
 // CHECK-EXC-ERROR-CXX: invalid argument '-fno-rtti' not allowed with '-fcxx-exceptions'
+
+// Make sure we only get the rtti argument we want
 // CHECK-RTTI-NOT: "-fno-rtti"
+// CHECK-RTTI: "-frtti"
+// CHECK-RTTI-NOT: "-fno-rtti"
+// CHECK-NO-RTTI-NOT: "-frtti"
+// CHECK-NO-RTTI: "-frtti"
 // CHECK-NO-RTTI-NOT: "-frtti"
 
 // CHECK-OK-NOT: {{warning:|error:}}
