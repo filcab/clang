@@ -3947,7 +3947,7 @@ void Clang::ConstructJob(Compilation &C, const JobAction &JA,
 
   // -frtti is default, except for the PS4 CPU.
   if (!Args.hasFlag(options::OPT_frtti, options::OPT_fno_rtti,
-                    !Triple.isPS4CPU()) ||
+                    !Triple.isPS4()) ||
       KernelOrKext) {
     bool RTTIEnabled = false;
     Arg *NoRTTIArg = Args.getLastArg(
@@ -3956,8 +3956,9 @@ void Clang::ConstructJob(Compilation &C, const JobAction &JA,
     // PS4 requires rtti when exceptions are enabled. If -fno-rtti was
     // explicitly passed, error out. Otherwise enable rtti and emit a
     // warning.
-    if (Triple.isPS4CPU()) {
-      if (Arg *A = Args.getLastArg(options::OPT_fcxx_exceptions)) {
+    if (Triple.isPS4()) {
+      if (Arg *A = Args.getLastArg(options::OPT_fcxx_exceptions,
+                                   options::OPT_fexceptions)) {
         if (NoRTTIArg)
           D.Diag(diag::err_drv_argument_not_allowed_with)
               << NoRTTIArg->getAsString(Args) << A->getAsString(Args);
