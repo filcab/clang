@@ -4040,16 +4040,14 @@ void Clang::ConstructJob(Compilation &C, const JobAction &JA,
     // -fno-rtti cannot usefully be combined with -fsanitize=vptr.
     if (Sanitize.sanitizesVptr()) {
       // If rtti was explicitly disabled and the vptr sanitizer is on, error
-      // out. Otherwise, warn that vptr will be disabled unless -frtti is
-      // passed.
+      // out. Otherwise, warn that rtti will be enabled because
+      // -fsanitize=vptr was passed.
       if (NoRTTIArg) {
         D.Diag(diag::err_drv_argument_not_allowed_with)
             << "-fsanitize=vptr" << NoRTTIArg->getAsString(Args);
       } else {
-        D.Diag(diag::warn_drv_disabling_vptr_no_rtti_default);
-        // All sanitizer switches have been pushed. This -fno-sanitize
-        // will override any -fsanitize={vptr,undefined} passed before it.
-        CmdArgs.push_back("-fno-sanitize=vptr");
+        RTTIEnabled = true;
+        D.Diag(diag::warn_drv_enabling_rtti_with_vptr);
       }
     }
 

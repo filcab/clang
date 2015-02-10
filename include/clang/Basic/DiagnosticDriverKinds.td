@@ -163,9 +163,9 @@ def warn_debug_compression_unavailable : Warning<"cannot compress debug sections
 def warn_drv_enabling_rtti_with_exceptions : Warning<
   "implicitly enabling rtti for exception handling">,
   InGroup<DiagGroup<"rtti-for-exceptions">>;
-def warn_drv_disabling_vptr_no_rtti_default : Warning<
-  "implicitly disabling vptr sanitizer because rtti wasn't enabled">,
-  InGroup<DiagGroup<"auto-disable-vptr-sanitizer">>;
+def warn_drv_enabling_rtti_with_vptr: Warning<
+  "implicitly enabling rtti for the vptr sanitizer">,
+  InGroup<DiagGroup<"rtti-for-vptr-sanitizer">>;
 
 def note_drv_command_failed_diag_msg : Note<
   "diagnostic msg: %0">;
