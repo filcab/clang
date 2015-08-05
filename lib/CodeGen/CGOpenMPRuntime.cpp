@@ -1285,11 +1285,11 @@ void CGOpenMPRuntime::emitCriticalRegion(CodeGenFunction &CGF,
 
 static void emitIfStmt(CodeGenFunction &CGF, llvm::Value *IfCond,
                        OpenMPDirectiveKind Kind,
-                       const RegionCodeGenTy &BodyOpGen) {
+                       const RegionCodeGenTy &BodyOpGen, SourceLocation Loc) {
   llvm::Value *CallBool = CGF.EmitScalarConversion(
       IfCond,
       CGF.getContext().getIntTypeForBitwidth(/*DestWidth=*/32, /*Signed=*/true),
-      CGF.getContext().BoolTy);
+      CGF.getContext().BoolTy, Loc);
 
   auto *ThenBlock = CGF.createBasicBlock("omp_if.then");
   auto *ContBlock = CGF.createBasicBlock("omp_if.end");
@@ -1321,7 +1321,7 @@ void CGOpenMPRuntime::emitMasterRegion(CodeGenFunction &CGF,
         NormalAndEHCleanup, createRuntimeFunction(OMPRTL__kmpc_end_master),
         llvm::makeArrayRef(Args));
     MasterOpGen(CGF);
-  });
+  }, Loc);
 }
 
 void CGOpenMPRuntime::emitTaskyieldCall(CodeGenFunction &CGF,
@@ -1455,7 +1455,7 @@ void CGOpenMPRuntime::emitSingleRegion(CodeGenFunction &CGF,
       CGF.Builder.CreateAlignedStore(CGF.Builder.getInt32(1), DidIt,
                                      DidIt->getAlignment());
     }
-  });
+  }, Loc);
   // call __kmpc_copyprivate(ident_t *, gtid, <buf_size>, <copyprivate list>,
   // <copy_func>, did_it);
   if (DidIt) {
@@ -1719,7 +1719,7 @@ llvm::Value *CGOpenMPRuntime::emitForNext(CodeGenFunction &CGF,
       CGF.EmitRuntimeCall(createDispatchNextFunction(IVSize, IVSigned), Args);
   return CGF.EmitScalarConversion(
       Call, CGF.getContext().getIntTypeForBitwidth(32, /* Signed */ true),
-      CGF.getContext().BoolTy);
+      CGF.getContext().BoolTy, Loc);
 }
 
 void CGOpenMPRuntime::emitNumThreadsClause(CodeGenFunction &CGF,
