@@ -2444,6 +2444,18 @@ static void emitCheckHandlerCall(CodeGenFunction &CGF,
   }
 }
 
+static StringRef getUBSanChecksDataSection(const CodeGenModule &CGM,
+                                           StringRef CheckName) {
+  if (CheckName == "type_mismatch")
+    return CGM.getTarget().getTriple().isOSBinFormatMachO()
+               ? "__DATA,ubsan_type_mism"
+               : ".ubsan_type_mismatch";
+
+  return CGM.getTarget().getTriple().isOSBinFormatMachO()
+             ? "__DATA,ubsan_check_data"
+             : ".ubsan_check_data";
+}
+
 void CodeGenFunction::EmitCheck(
     ArrayRef<std::pair<llvm::Value *, SanitizerMask>> Checked,
     StringRef CheckName, ArrayRef<llvm::Constant *> StaticArgs,
@@ -2512,6 +2524,7 @@ void CodeGenFunction::EmitCheck(
     auto *InfoPtr =
         new llvm::GlobalVariable(CGM.getModule(), Info->getType(), false,
                                  llvm::GlobalVariable::PrivateLinkage, Info);
+    InfoPtr->setSection(getUBSanChecksDataSection(CGM, CheckName));
     InfoPtr->setUnnamedAddr(true);
     CGM.getSanitizerMetadata()->disableSanitizerForGlobal(InfoPtr);
     Args.push_back(Builder.CreateBitCast(InfoPtr, Int8PtrTy));
