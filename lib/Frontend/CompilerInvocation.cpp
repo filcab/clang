@@ -782,6 +782,9 @@ static bool ParseCodeGenArgs(CodeGenOptions &Opts, ArgList &Args, InputKind IK,
   Opts.CudaGpuBinaryFileNames =
       Args.getAllArgValues(OPT_fcuda_include_gpubinary);
 
+  Opts.EmitCheckPathComponentsToStrip = getLastArgIntValue(
+      Args, OPT_fsanitize_undefined_strip_path_components_EQ, 0, Diags);
+
   return Success;
 }
 
