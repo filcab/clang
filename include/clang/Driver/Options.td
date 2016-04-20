@@ -1096,6 +1096,10 @@ def Wlarge_by_value_copy_def : Flag<["-"], "Wlarge-by-value-copy">,
   HelpText<"Warn if a function definition returns or accepts an object larger "
            "in bytes than a given value">, Flags<[HelpHidden]>;
 def Wlarge_by_value_copy_EQ : Joined<["-"], "Wlarge-by-value-copy=">, Flags<[CC1Option]>;
+def fstrip_components_from_checks : Joined<["-"], "fstrip-path-components-from-checks=">,
+  Group<f_clang_Group>, Flags<[CC1Option]>, MetaVarName<"<number>">,
+  HelpText<"Strip (or keep only, if negative) a given number of path components "
+           "when emitting check metadata.">;
 
 // These "special" warning flags are effectively processed as f_Group flags by the driver:
 // Just silence warnings about -Wlarger-than for now.
