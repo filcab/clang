@@ -576,11 +576,9 @@ void CodeGenFunction::EmitTypeCheck(TypeCheckKind TCK, SourceLocation Loc,
 
   if (Checks.size() > 0) {
     llvm::Constant *StaticData[] = {
-     EmitCheckSourceLocation(Loc),
-      EmitCheckTypeDescriptor(Ty),
-      llvm::ConstantInt::get(SizeTy, AlignVal),
-      llvm::ConstantInt::get(Int8Ty, TCK)
-    };
+        EmitCheckSourceLocation(Loc), EmitCheckTypeDescriptor(Ty),
+        llvm::ConstantInt::get(SizeTy, AlignVal),
+        llvm::ConstantInt::get(Int8Ty, TCK)};
     EmitCheck(Checks, "type_mismatch", StaticData, Ptr);
   }
 
